@@ -18,10 +18,10 @@ public:
   template <std::size_t N2_ = N_>
   static constexpr inline std::size_t get_side_length(void) {
     if constexpr (N2_ == 0) {
-      return 5;
+      return 3;
     } else {
       // keeps all line lengths the same
-      return ((get_side_length<N2_ - 1>() - 2) * 3);
+      return ((get_side_length<N2_ - 1>() * 2) - 1);
     }
   }
 
@@ -33,9 +33,9 @@ public:
     bits.reset();
 
     if constexpr (N_ == 0) {
-      for (std::size_t x = 1; x < SIDE_LENGTH - 1; x++) {
-        for (std::size_t y = 1; y < SIDE_LENGTH - 1; y++) {
-          if ((x == 1 || (SIDE_LENGTH - x - 1 == 1)) || (y == 1)) {
+      for (std::size_t x = 0; x < SIDE_LENGTH; x++) {
+        for (std::size_t y = 0; y < SIDE_LENGTH; y++) {
+          if ((x == 0 || (x == SIDE_LENGTH - 1)) || (y == 0)) {
             bits.set(x + SIDE_LENGTH * y);
           }
         }
@@ -51,7 +51,27 @@ public:
       // TODO: use children
     }
   }
+
+  inline draw_bits_type draw(void) const {
+    draw_bits_type out;
+    draw(out);
+    return out;
+  }
 };
+
+template <std::size_t Rows_, std::size_t Columns_, std::size_t Pad_ = 1>
+constexpr inline std::bitset<(Rows_ + Pad_ * 2) * (Columns_ + Pad_ * 2)> pad(const std::bitset<Rows_ * Columns_>& bits) {
+  std::bitset<(Rows_ + Pad_ * 2) * (Columns_ + Pad_ * 2)> out;
+
+  out.reset();
+  for (std::size_t row = 0; row < Rows_; row++) {
+    for (std::size_t column = 0; column < Columns_; column++) {
+      if (bits[row * Columns_ + column]) out.set((row + Pad_) * (Columns_ + Pad_ * 2) + (column + Pad_));
+    }
+  }
+
+  return out;
+}
 
 template <std::size_t Rows_, std::size_t Columns_>
 static inline std::array<std::array<discrete_pixel_type, Rows_>, Columns_> black_and_white(const std::bitset<Rows_ * Columns_>& bits) {
@@ -59,8 +79,7 @@ static inline std::array<std::array<discrete_pixel_type, Rows_>, Columns_> black
 
   for (std::size_t row = 0; row < Rows_; row++) {
     for (std::size_t column = 0; column < Columns_; column++) {
-      out[row][column] = bits[row * Columns_ + column] ? discrete_pixel_type{ 0, 0, 0 } //  : discrete_pixel_type{255, 255, 255};
-                                                       : discrete_pixel_type{ 65535, 65535, 65535 };
+      out[row][column] = bits[row * Columns_ + column] ? discrete_pixel_type{ 0, 0, 0 } : discrete_pixel_type{ 65535, 65535, 65535 };
     }
   }
 
@@ -93,15 +112,17 @@ static inline void make_image_from_array(const std::array<std::array<discrete_pi
 int main(const int argc, const char *const *const argv) {
   InitializeMagick(nullptr);
 
-  Hilbert<0> hilbert;
+  using hilbert_type = Hilbert<0>;
 
-  std::bitset<25> bits;
+  hilbert_type hilbert;
 
-  hilbert.draw(bits);
+  auto draw_bits = hilbert.draw();
 
-  auto image_matrix = black_and_white<5, 5>(bits);
+  auto padded_bits = pad<3, 3, 1>(draw_bits);
+
+  auto image_matrix = black_and_white<5, 5>(padded_bits);
 
   make_image_from_array<5, 5>(image_matrix, "matrix.png");
 
-  return -1;
+  return 0;
 }
