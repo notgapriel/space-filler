@@ -1,0 +1,47 @@
+BasedOnStyle: LLVM
+IndentWidth: 2
+ContinuationIndentWidth: 2
+
+---
+# Applies for C and Cpp
+Language: Cpp
+Standard: c++20
+ColumnLimit: 150
+BinPackArguments: false
+AlwaysBreakAfterReturnType: None
+RemoveSemicolon: true
+UseTab: Never
+BreakBeforeTernaryOperators: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+IndentCaseLabels: true
+NamespaceIndentation: None
+RequiresExpressionIndentation: OuterScope
+Cpp11BracedListStyle: false
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+AlignAfterOpenBracket: BlockIndent
+AlignConsecutiveAssignments: AcrossComments
+AlignConsecutiveBitFields: Consecutive
+# Alignment is a bit inconsistent but I think it's prettiest
+QualifierAlignment: Left
+PointerAlignment: Right
+ReferenceAlignment: Left
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+InsertNewlineAtEOF: true
+SpaceAfterLogicalNot: false
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpaceAfterCStyleCast: true
+PenaltyReturnTypeOnItsOwnLine: 2147483647
+SpaceAfterTemplateKeyword: true
+AlwaysBreakTemplateDeclarations: Yes
+FixNamespaceComments: false
+LambdaBodyIndentation: OuterScope
+# InsertBraces: true # cannot be used without affecting above config
+BracedInitializerIndentWidth: 2
+ReflowComments: true
