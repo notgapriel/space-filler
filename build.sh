@@ -8,5 +8,5 @@ cd "$SCRIPTPATH" && \
 # create directory if does not already exist
 mkdir -p build && \
 chmod a+rwx build && \
-g++ -o build/out src/main.cpp `GraphicsMagick++-config --cppflags --cxxflags --ldflags --libs`
+g++ -o build/out src/main.cpp -std=gnu++26 `GraphicsMagick++-config --cppflags --cxxflags --ldflags --libs`
 chmod a+rwx build/out
