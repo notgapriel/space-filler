@@ -53,6 +53,50 @@ public:
 
   using draw_bits_type = std::bitset<SIDE_LENGTH * SIDE_LENGTH>;
 
+private:
+  template <std::size_t Quadrant_>
+  constexpr inline const void populate_child(auto& bits) const {
+    using child_type      = Hilbert<N_ - 1>;
+    using child_bits_type = typename child_type::draw_bits_type;
+
+    child_bits_type child_bits;
+
+    child_bits.reset();
+    if (_children[Quadrant_]) {
+      child_bits = _children[Quadrant_]->draw();
+    } else {
+      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+        child_bits.set(x);
+      }
+
+      for (std::size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
+        static constexpr const std::size_t X_OFFSETS[2] = { 0, child_type::SIDE_LENGTH - 1 };
+
+        child_bits.set(X_OFFSETS[0] + y * (child_type::SIDE_LENGTH));
+        child_bits.set(X_OFFSETS[1] + y * (child_type::SIDE_LENGTH));
+      }
+    }
+    for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+      for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
+        static constexpr const std::size_t X_OFFSET = Quadrant_ == 0 || Quadrant_ == 3 ? SIDE_LENGTH - child_type::SIDE_LENGTH : 0;
+        static constexpr const std::size_t Y_OFFSET = Quadrant_ == 2 || Quadrant_ == 3 ? SIDE_LENGTH - child_type::SIDE_LENGTH : 0;
+
+        if (!child_bits[x + child_type::SIDE_LENGTH * y]) continue;
+
+        if constexpr (Quadrant_ == 0 || Quadrant_ == 1) {
+          bits.set((x + X_OFFSET) + SIDE_LENGTH * (y + Y_OFFSET));
+        } else if constexpr (Quadrant_ == 2) {
+          bits.set(((child_type::SIDE_LENGTH - 1 - y) + X_OFFSET) + SIDE_LENGTH * (x + Y_OFFSET));
+        } else if constexpr (Quadrant_ == 3) {
+          bits.set((y + X_OFFSET) + SIDE_LENGTH * (x + Y_OFFSET));
+        } else {
+          static_assert(false, "Invalid quadrant supplied to function, must be [0,3]");
+        }
+      }
+    }
+  }
+
+public:
   inline void draw(draw_bits_type& bits) const {
     bits.reset();
 
@@ -68,97 +112,10 @@ public:
       using child_type           = Hilbert<N_ - 1>;
       using child_draw_bits_type = typename child_type::draw_bits_type;
 
-      child_draw_bits_type child_bits;
-
-      child_bits.reset();
-      if (_children[0]) {
-        child_bits = _children[0]->draw();
-      } else {
-        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          child_bits.set(x);
-        }
-
-        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
-          static constexpr const std::size_t X_OFFSETS[2] = { 0, child_type::SIDE_LENGTH - 1 };
-
-          child_bits.set(X_OFFSETS[0] + y * (child_type::SIDE_LENGTH));
-          child_bits.set(X_OFFSETS[1] + y * (child_type::SIDE_LENGTH));
-        }
-      }
-      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-          static constexpr const std::size_t X_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
-          static constexpr const std::size_t Y_OFFSET = 0;
-
-          bits.set((x + X_OFFSET) + SIDE_LENGTH * (y + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-        }
-      }
-
-      child_bits.reset();
-      if (_children[1]) {
-        child_bits = _children[1]->draw();
-      } else {
-        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          child_bits.set(x);
-        }
-
-        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
-          child_bits.set(0 + y * (child_type::SIDE_LENGTH));
-          child_bits.set(child_type::SIDE_LENGTH - 1 + y * (child_type::SIDE_LENGTH));
-        }
-      }
-      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-          static constexpr const std::size_t X_OFFSET = 0;
-          static constexpr const std::size_t Y_OFFSET = 0;
-
-          bits.set((x + X_OFFSET) + SIDE_LENGTH * (y + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-        }
-      }
-
-      child_bits.reset();
-      if (_children[2]) {
-        child_bits = _children[2]->draw();
-      } else {
-        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          child_bits.set(x);
-        }
-
-        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
-          child_bits.set(0 + y * (child_type::SIDE_LENGTH));
-          child_bits.set(child_type::SIDE_LENGTH - 1 + y * (child_type::SIDE_LENGTH));
-        }
-      }
-      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-          static constexpr const std::size_t X_OFFSET = 0;
-          static constexpr const std::size_t Y_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
-
-          bits.set(((child_type::SIDE_LENGTH - 1 - y) + X_OFFSET) + SIDE_LENGTH * ((x) + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-        }
-      }
-
-      child_bits.reset();
-      if (_children[3]) {
-        child_bits = _children[3]->draw();
-      } else {
-        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          child_bits.set(x);
-        }
-
-        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
-          child_bits.set(0 + y * (child_type::SIDE_LENGTH));
-          child_bits.set(child_type::SIDE_LENGTH - 1 + y * (child_type::SIDE_LENGTH));
-        }
-      }
-      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-          static constexpr const std::size_t X_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
-          static constexpr const std::size_t Y_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
-
-          bits.set((y + X_OFFSET) + SIDE_LENGTH * ((x) + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-        }
-      }
+      populate_child<0>(bits);
+      populate_child<1>(bits);
+      populate_child<2>(bits);
+      populate_child<3>(bits);
 
       bits.set(0 + child_type::SIDE_LENGTH * SIDE_LENGTH, true);                             // left join
       bits.set(SIDE_LENGTH - 1 + child_type::SIDE_LENGTH * SIDE_LENGTH, true);               // right join
