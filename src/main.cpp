@@ -39,21 +39,6 @@ public:
   constexpr Hilbert(const Self&) = default;
   constexpr Hilbert(Self&&)      = default;
 
-  static constexpr inline Self make_full(void) {
-    if constexpr (N_ == 0) {
-      return Self();
-    } else {
-      using child_type = Hilbert<N_ - 1>;
-
-      return Self(children_type{
-        std::make_unique<child_type>(child_type::make_full()),
-        std::make_unique<child_type>(child_type::make_full()),
-        std::make_unique<child_type>(child_type::make_full()),
-        std::make_unique<child_type>(child_type::make_full()),
-      });
-    }
-  }
-
   template <std::size_t N2_ = N_>
   static constexpr inline std::size_t get_side_length(void) {
     if constexpr (N2_ == 0) {
@@ -88,52 +73,90 @@ public:
       child_bits.reset();
       if (_children[0]) {
         child_bits = _children[0]->draw();
-        for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-            static constexpr const std::size_t X_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
-            static constexpr const std::size_t Y_OFFSET = 0;
+      } else {
+        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+          child_bits.set(x);
+        }
 
-            bits.set((x + X_OFFSET) + SIDE_LENGTH * (y + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-          }
+        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
+          static constexpr const std::size_t X_OFFSETS[2] = { 0, child_type::SIDE_LENGTH - 1 };
+
+          child_bits.set(X_OFFSETS[0] + y * (child_type::SIDE_LENGTH));
+          child_bits.set(X_OFFSETS[1] + y * (child_type::SIDE_LENGTH));
+        }
+      }
+      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
+          static constexpr const std::size_t X_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
+          static constexpr const std::size_t Y_OFFSET = 0;
+
+          bits.set((x + X_OFFSET) + SIDE_LENGTH * (y + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
         }
       }
 
       child_bits.reset();
       if (_children[1]) {
         child_bits = _children[1]->draw();
-        for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-            static constexpr const std::size_t X_OFFSET = 0;
-            static constexpr const std::size_t Y_OFFSET = 0;
+      } else {
+        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+          child_bits.set(x);
+        }
 
-            bits.set((x + X_OFFSET) + SIDE_LENGTH * (y + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-          }
+        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
+          child_bits.set(0 + y * (child_type::SIDE_LENGTH));
+          child_bits.set(child_type::SIDE_LENGTH - 1 + y * (child_type::SIDE_LENGTH));
+        }
+      }
+      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
+          static constexpr const std::size_t X_OFFSET = 0;
+          static constexpr const std::size_t Y_OFFSET = 0;
+
+          bits.set((x + X_OFFSET) + SIDE_LENGTH * (y + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
         }
       }
 
       child_bits.reset();
       if (_children[2]) {
         child_bits = _children[2]->draw();
-        for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-            static constexpr const std::size_t X_OFFSET = 0;
-            static constexpr const std::size_t Y_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
+      } else {
+        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+          child_bits.set(x);
+        }
 
-            bits.set(((child_type::SIDE_LENGTH - 1 - y) + X_OFFSET) + SIDE_LENGTH * ((x) + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-          }
+        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
+          child_bits.set(0 + y * (child_type::SIDE_LENGTH));
+          child_bits.set(child_type::SIDE_LENGTH - 1 + y * (child_type::SIDE_LENGTH));
+        }
+      }
+      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
+          static constexpr const std::size_t X_OFFSET = 0;
+          static constexpr const std::size_t Y_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
+
+          bits.set(((child_type::SIDE_LENGTH - 1 - y) + X_OFFSET) + SIDE_LENGTH * ((x) + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
         }
       }
 
       child_bits.reset();
       if (_children[3]) {
         child_bits = _children[3]->draw();
-        for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
-          for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
-            static constexpr const std::size_t X_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
-            static constexpr const std::size_t Y_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
+      } else {
+        for (size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+          child_bits.set(x);
+        }
 
-            bits.set((y + X_OFFSET) + SIDE_LENGTH * ((x) + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
-          }
+        for (size_t y = 1; y < child_type::SIDE_LENGTH; y++) {
+          child_bits.set(0 + y * (child_type::SIDE_LENGTH));
+          child_bits.set(child_type::SIDE_LENGTH - 1 + y * (child_type::SIDE_LENGTH));
+        }
+      }
+      for (std::size_t x = 0; x < child_type::SIDE_LENGTH; x++) {
+        for (std::size_t y = 0; y < child_type::SIDE_LENGTH; y++) {
+          static constexpr const std::size_t X_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
+          static constexpr const std::size_t Y_OFFSET = SIDE_LENGTH - child_type::SIDE_LENGTH;
+
+          bits.set((y + X_OFFSET) + SIDE_LENGTH * ((x) + Y_OFFSET), child_bits[x + child_type::SIDE_LENGTH * y]);
         }
       }
 
@@ -147,6 +170,21 @@ public:
     draw_bits_type out;
     draw(out);
     return out;
+  }
+
+  static constexpr inline Self make_full(void) {
+    if constexpr (N_ == 0) {
+      return Self();
+    } else {
+      using child_type = Hilbert<N_ - 1>;
+
+      return Self(children_type{
+        std::make_unique<child_type>(child_type::make_full()),
+        std::make_unique<child_type>(child_type::make_full()),
+        std::make_unique<child_type>(child_type::make_full()),
+        std::make_unique<child_type>(child_type::make_full()),
+      });
+    }
   }
 
 private:
