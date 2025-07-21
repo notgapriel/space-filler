@@ -1,4 +1,3 @@
 #!/bin/bash 
 ./build.sh && \
-cd build && \
-./out
+./build/out ${@:2,1} # all arguments for this script passed to executable
