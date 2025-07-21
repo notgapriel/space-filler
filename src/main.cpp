@@ -105,7 +105,7 @@ private:
         if constexpr (Quadrant_ == 0 || Quadrant_ == 1) {
           bits.set((x + X_OFFSET) + side_length * (y + Y_OFFSET));
         } else if constexpr (Quadrant_ == 2) {
-          bits.set(((child_side_length - 1 - y) + X_OFFSET) + side_length * (x + Y_OFFSET));
+          bits.set(((child_side_length - 1 - y) + X_OFFSET) + side_length * ((child_side_length - 1 - x) + Y_OFFSET));
         } else if constexpr (Quadrant_ == 3) {
           bits.set((y + X_OFFSET) + side_length * (x + Y_OFFSET));
         } else {
