@@ -8,5 +8,8 @@ cd "$SCRIPTPATH" && \
 # create directory if does not already exist
 mkdir -p build && \
 chmod a+rwx build && \
-g++ -o build/out src/main.cpp -std=gnu++26 `GraphicsMagick++-config --cppflags --cxxflags --ldflags --libs` && \
-chmod a+rwx build/out
+cmake -B build -S . > build/cmake.log && \
+chmod a+rwx build/Makefile && \
+cd build && \
+make -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu) > make.log && \
+chmod a+rwx out
